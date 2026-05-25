@@ -27,4 +27,18 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Configures resource access rules, caller context accessors, and resource object accessors for a specific resource type. This method can be used after calling <see cref="AddWincheSentinel{TResource}"/> to further customize the behavior of WincheSentinel for the specified resource type.
+    /// </summary>
+    /// <typeparam name="TResource">The type of the resource for which to configure services.</typeparam>
+    /// <param name="services">The service collection to which the services will be added.</param>
+    /// <param name="configure">An optional action to further configure resource access rules, caller context accessors, and resource object accessors using the <see cref="DependencyConfigurator{TResource}"/>.</param>
+    /// <returns>The updated service collection.</returns>
+    public static IServiceCollection ConfigureWincheSentinel<TResource>(this IServiceCollection services, Action<DependencyConfigurator<TResource>>? configure = null) where TResource : class 
+    {
+        configure?.Invoke(new DependencyConfigurator<TResource>(services));
+
+        return services;
+    }
 }
