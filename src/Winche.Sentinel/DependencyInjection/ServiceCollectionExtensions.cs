@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IPathPatternMatcher<TResource>, PathPatternMatcher<TResource>>();
         services.AddSingleton<IAccessRuleEvaluator<TResource>, AccessRuleEvaluator<TResource>>();
-        services.AddSingleton<ICallerClaimsAccessor<TResource>, EmptyCallerClaimsAccessor<TResource>>();
+        services.AddSingleton<ICallerClaimsAccessor<TResource>, EmptyClaimsAccessor<TResource>>();
 
         configure?.Invoke(new DependencyConfigurator<TResource>(services));
 

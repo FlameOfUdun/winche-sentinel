@@ -68,7 +68,7 @@ public class ServiceCollectionExtensionsTests
         var sp = services.BuildServiceProvider();
 
         var accessor = sp.GetRequiredService<ICallerClaimsAccessor<Resource>>();
-        Assert.IsType<EmptyCallerClaimsAccessor<Resource>>(accessor);
+        Assert.IsType<EmptyClaimsAccessor<Resource>>(accessor);
     }
 
     [Fact]

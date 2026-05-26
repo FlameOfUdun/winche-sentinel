@@ -7,7 +7,7 @@ public class EmptyCallerClaimsAccessorTests
 {
     private sealed class Resource { }
 
-    private readonly EmptyCallerClaimsAccessor<Resource> _sut = new();
+    private readonly EmptyClaimsAccessor<Resource> _sut = new();
 
     [Fact]
     public void GetClaims_ReturnsEmptyDictionary()

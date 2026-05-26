@@ -67,7 +67,7 @@ public class AccessRuleEvaluatorTests
         ICallerClaimsAccessor<Resource>? claimsAccessor = null)
     {
         var matcher = new PathPatternMatcher<Resource>();
-        var accessor = claimsAccessor ?? new EmptyCallerClaimsAccessor<Resource>();
+        var accessor = claimsAccessor ?? new EmptyClaimsAccessor<Resource>();
         return new AccessRuleEvaluator<Resource>(rules, matcher, accessor);
     }
 
