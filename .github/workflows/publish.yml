@@ -27,7 +27,9 @@ jobs:
         run: dotnet test -c Release --no-build
 
       - name: Pack
-        run: dotnet pack src/Winche.Sentinel/Winche.Sentinel.csproj -c Release --no-build -o ./packages
+        run: |
+          dotnet pack src/Winche.Sentinel/Winche.Sentinel.csproj -c Release --no-build -o ./packages
+          dotnet pack src/Winche.Sentinel.AspNetCore/Winche.Sentinel.AspNetCore.csproj -c Release --no-build -o ./packages
 
       - name: Push
         run: dotnet nuget push ./packages/*.nupkg ./packages/*.snupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
