@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Winche.Sentinel/Winche.Sentinel.csproj" />
+    <Project Path="src/Winche.Sentinel.AspNetCore/Winche.Sentinel.AspNetCore.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Winche.Sentinel.Tests/Winche.Sentinel.Tests.csproj" />
