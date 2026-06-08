@@ -21,6 +21,14 @@ public enum AccessOperation
     /// Represents a delete operation on a resource, such as removing data or deleting an entity.
     /// </summary>
     Delete,
+
+    /// <summary>
+    /// Represents an aggregation operation over a collection, such as running an aggregation
+    /// pipeline (count, sum, group, lookup, …). Distinct from <see cref="Read"/>: granting read
+    /// access to a collection's documents does not authorize aggregating across them, because an
+    /// aggregate result can reveal information about documents the caller cannot read individually.
+    /// </summary>
+    Aggregate,
 }
 
 /// <summary>

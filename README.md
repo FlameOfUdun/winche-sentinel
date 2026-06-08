@@ -82,7 +82,7 @@ c.AddResourceAccessRule<DocumentRule>();
 
 | Member | Description |
 | ------ | ----------- |
-| `Operation` | `Read`, `Write`, or `Delete` |
+| `Operation` | `Read`, `Write`, `Delete`, or `Aggregate` |
 | `Path` | The path being accessed |
 | `Params` | Path parameters extracted from the pattern |
 | `Claims` | Caller claims from `ICallerClaimsAccessor` |
