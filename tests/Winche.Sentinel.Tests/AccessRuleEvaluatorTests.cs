@@ -209,19 +209,31 @@ public class AccessRuleEvaluatorTests
             () => sut.EvaluateAsync(AccessOperation.Read, "/docs/42"));
     }
 
-    // ── Rule ordering ─────────────────────────────────────────────────────────
+    // ── Rule combination (OR semantics) ───────────────────────────────────────
 
     [Fact]
-    public async Task EvaluateAsync_WhenFirstRuleDenies_DoesNotEvaluateSecondRule()
+    public async Task EvaluateAsync_WhenEarlierRuleDenies_StillGrantedByLaterRule()
     {
+        // OR: a matching rule returning false does not veto; any matching rule that grants allows access.
         var first = new FakeRule { Path = "/**", Allow = false };
         var second = new FakeRule { Path = "/**", Allow = true };
         var sut = Build([first, second]);
 
+        await sut.EvaluateAsync(AccessOperation.Read, "/docs/42");
+
+        Assert.NotNull(first.CapturedContext);   // first was evaluated (did not grant)
+        Assert.NotNull(second.CapturedContext);  // evaluation continued to the granting rule
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenAllMatchingRulesDeny_ThrowsAccessDenied()
+    {
+        var first = new FakeRule { Path = "/**", Allow = false };
+        var second = new FakeRule { Path = "/**", Allow = false };
+        var sut = Build([first, second]);
+
         await Assert.ThrowsAsync<AccessDeniedException>(
             () => sut.EvaluateAsync(AccessOperation.Read, "/docs/42"));
-
-        Assert.Null(second.CapturedContext);
     }
 
     [Fact]

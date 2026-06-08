@@ -5,7 +5,7 @@ using Winche.Sentinel.Models;
 namespace Winche.Sentinel.Services;
 
 /// <summary>
-/// Implements the <see cref="IAccessRuleEvaluator{TResource}"/> interface to evaluate access rules for a specific resource type. This class takes a collection of access rules, a path pattern matcher, a caller context accessor, and a resource object accessor as dependencies to perform access evaluation based on the defined rules and the context of the access request. The evaluation process involves matching the resource path against the defined rules, checking if the operation is allowed by the rule, and evaluating the rule's logic to determine whether access should be granted or denied. If no rules match or if access is denied by any rule, appropriate exceptions are thrown to indicate the outcome of the evaluation process.
+/// Implements the <see cref="IAccessRuleEvaluator{TResource}"/> interface to evaluate access rules for a specific resource type.
 /// </summary>
 /// <typeparam name="TResource">The type of the resource for which access rules are being evaluated.</typeparam>
 /// <param name="accessRules">A collection of access rules to be evaluated for the specified resource type.</param>
@@ -46,8 +46,18 @@ public sealed class AccessRuleEvaluator<TResource>(
         await EvaluateRulesAsync(context, operation, path, ct);
     }
 
+    /// <summary>
+    /// OR semantics: a request is granted if ANY rule whose path pattern and
+    /// operation set match returns <c>true</c>; a matching rule that returns <c>false</c> does not
+    /// veto, it simply does not grant. Access is the default-deny outcome:
+    /// <see cref="AccessDeniedException"/> when rules matched but none granted, and
+    /// <see cref="NoRulesMatchedException"/> when no rule matched the path and operation at all.
+    /// Registration order does not affect the decision.
+    /// </summary>
     private async Task EvaluateRulesAsync(AccessContext<TResource> context, AccessOperation operation, string path, CancellationToken ct)
     {
+        var anyRuleMatched = false;
+
         foreach (var rule in accessRules)
         {
             if (rule.Operations is not null && !rule.Operations.Contains(operation))
@@ -68,13 +78,14 @@ public sealed class AccessRuleEvaluator<TResource>(
                 pathParams = result.Params;
             }
 
-            context = context with { Params = pathParams };
+            anyRuleMatched = true;
 
-            if (await rule.EvaluateAsync(context, ct))
+            if (await rule.EvaluateAsync(context with { Params = pathParams }, ct))
                 return;
-
-            throw new AccessDeniedException(operation, path);
         }
+
+        if (anyRuleMatched)
+            throw new AccessDeniedException(operation, path);
 
         throw new NoRulesMatchedException(operation, path);
     }

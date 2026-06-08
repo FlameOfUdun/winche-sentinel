@@ -30,12 +30,14 @@ await evaluator.EvaluateAsync(
 
 ## How It Works
 
-1. The evaluator matches the incoming path against each registered rule's path pattern.
-2. The first matching rule's `EvaluateAsync` is called with an `AccessContext<TResource>`.
-3. Return `true` to grant access, `false` to deny (`AccessDeniedException` is thrown).
-4. If no rule matches, `NoRulesMatchedException` is thrown.
+For a given operation and path, the evaluator considers **every** registered rule that matches the request:
 
-Rules are matched in registration order. A rule with a `null` path matches every path; a rule with a `null` operations set matches every operation.
+1. A rule matches when its path pattern matches the path **and** its operations set contains the operation. (A `null` path matches every path; a `null` operations set matches every operation.)
+2. Each matching rule's `EvaluateAsync` is called with an `AccessContext<TResource>`. Returning `true` **grants** access — evaluation stops and the request is allowed.
+3. A matching rule returning `false` does **not** deny; it simply doesn't grant, and evaluation continues to the next matching rule.
+4. Access is the default-deny outcome: if at least one rule matched but none granted, `AccessDeniedException` is thrown; if no rule matched the path and operation at all, `NoRulesMatchedException` is thrown.
+
+These are **OR / grant-only** semantics (Firestore-style): there is no explicit deny, and registration order does **not** affect the decision. Because a grant cannot be revoked by another rule, **grant narrowly** — don't write a broad `**` grant and expect a more specific rule to restrict it; grant access only where it should be allowed and let default-deny cover the rest.
 
 ## Path Patterns
 
